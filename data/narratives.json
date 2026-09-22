@@ -1,0 +1,43 @@
+{
+  "_readme": [
+    "A narrative = an itinerary through the items. Each narrative has an 'order' array of ids (from items.json) that defines prev/next.",
+    "The same item can appear in more than one narrative, even in a different order.",
+    "'timeline' is the required historical narrative: it is currently populated with the order of the item list from the project document as a placeholder,",
+    "to be corrected with the real chronology (Renzi's life/career dates) before submission.",
+    "The second narrative is still to be decided as a group (see ARCHITECTURE-NOTES.md) — the structure is ready, the content is empty."
+  ],
+  "narratives": [
+    {
+      "id": "timeline",
+      "title": "Historical timeline",
+      "description": null,
+      "required": true,
+      "order": [
+        "lettera-al-padre",
+        "articolo-larmata-sagapo",
+        "foto-notti-del-melodramma",
+        "film-la-strada",
+        "colonna-sonora-la-strada",
+        "foto-la-strada-01",
+        "foto-la-strada-004",
+        "disegno-gelsomina",
+        "sceneggiatura-quando-il-po-e-dolce",
+        "guida-per-camminare-allombra",
+        "il-primo-fellini",
+        "caricatura-renzi-fellini",
+        "foto-famiglia-renzi-002",
+        "photo-bologna-fotografata",
+        "videointervista-renzi-columbus-film"
+      ],
+      "_todo": "PLACEHOLDER order — verify the real date of each item (with Claudia / Anna Fiaccarini) and correct the chronological sequence"
+    },
+    {
+      "id": "TBD-second-narrative",
+      "title": null,
+      "description": null,
+      "required": true,
+      "order": [],
+      "_todo": "second narrative still to be decided as a group (e.g. 'Renzi the critic' vs 'Renzi the curator', or 'Renzi soldier/screenwriter/filmmaker' from the brainstorming ideas)"
+    }
+  ]
+}
