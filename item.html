@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Item — Renzo Renzi Virtual Exhibition</title>
+  <!--
+    This file is a WORKING SKELETON, not the final design.
+    It shows how data/items.json, data/narratives.json and js/main.js
+    connect: data loading, prev/next, theme switching, text selector.
+    River will replace the markup/classes with the real layout and the
+    6 CSS themes; the data/id structure below can stay as is.
+  -->
+  <link rel="stylesheet" href="css/theme-3.css" id="theme-stylesheet">
+</head>
+<body>
+
+  <header>
+    <nav aria-label="Theme navigation">
+      <label for="theme-select">Theme:</label>
+      <select id="theme-select"></select>
+    </nav>
+  </header>
+
+  <main id="item-view">
+    <p id="loading-message">Loading…</p>
+  </main>
+
+  <footer>
+    <nav aria-label="Navigation between items">
+      <button id="prev-button" disabled>&larr; Previous</button>
+      <div id="text-selectors"></div>
+      <button id="next-button" disabled>Next &rarr;</button>
+    </nav>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    (async function initItemPage() {
+      await Exhibition.load();
+      Exhibition.applyStoredTheme();
+      populateThemeSelect();
+
+      // Current state read from the query string: item.html?narrative=timeline&item=il-primo-fellini
+      let narrativeId = Exhibition.getQueryParam("narrative") || "timeline";
+      let itemId = Exhibition.getQueryParam("item");
+
+      // If no item was passed, start from the first one in the narrative.
+      if (!itemId) {
+        const items = Exhibition.getNarrativeItems(narrativeId);
+        itemId = items.length > 0 ? items[0].id : null;
+      }
+
+      renderItem(narrativeId, itemId);
+      wireNavButtons(narrativeId, itemId);
+
+      // swap the theme <link> whenever the user changes it
+      document.getElementById("theme-select").addEventListener("change", (e) => {
+        const theme = Exhibition.getThemes().find(t => t.id === e.target.value);
+        Exhibition.setTheme(theme.id);
+        document.getElementById("theme-stylesheet").href = theme.cssFile;
+      });
+
+      function populateThemeSelect() {
+        const select = document.getElementById("theme-select");
+        const current = Exhibition.getCurrentTheme();
+        Exhibition.getThemes().forEach((theme) => {
+          const opt = document.createElement("option");
+          opt.value = theme.id;
+          opt.textContent = `${theme.period} — ${theme.label}`;
+          opt.selected = theme.id === current.id;
+          select.appendChild(opt);
+        });
+      }
+
+      function renderItem(narrativeId, itemId) {
+        const container = document.getElementById("item-view");
+        const item = Exhibition.getItem(itemId);
+
+        if (!item) {
+          container.innerHTML = "<p>Item not found.</p>";
+          return;
+        }
+
+        const prefs = Exhibition.getTextPreference();
+        const text = Exhibition.findText(item, prefs);
+
+        container.innerHTML = `
+          <article>
+            <h1>${item.title}</h1>
+            <p><strong>${item.creator || "Unknown creator"}</strong> — ${item.itemType}</p>
+            <div class="item-text">${text ? text.content : "[text to be written — see item.texts in items.json]"}</div>
+          </article>
+        `;
+      }
+
+      function wireNavButtons(narrativeId, itemId) {
+        const prevItem = Exhibition.getPrevItem(narrativeId, itemId);
+        const nextItem = Exhibition.getNextItem(narrativeId, itemId);
+
+        const prevBtn = document.getElementById("prev-button");
+        const nextBtn = document.getElementById("next-button");
+
+        prevBtn.disabled = !prevItem;
+        nextBtn.disabled = !nextItem;
+
+        if (prevItem) {
+          prevBtn.onclick = () => {
+            window.location.href = Exhibition.buildItemUrl(narrativeId, prevItem.id);
+          };
+        }
+        if (nextItem) {
+          nextBtn.onclick = () => {
+            window.location.href = Exhibition.buildItemUrl(narrativeId, nextItem.id);
+          };
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
